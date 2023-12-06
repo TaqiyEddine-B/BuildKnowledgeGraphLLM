@@ -22,3 +22,12 @@ Once the Conda environment is activated, you can install the dependencies from t
 
 ```bash
 pip install -r requirements.txt
+```
+
+# Usage
+To run the code, use the following command:
+
+```bash
+streamlit run main.py
+```
+
