@@ -1,6 +1,7 @@
-from streamlit_agraph import agraph, Node, Edge, Config
+import json
 import os
 
+import streamlit as st
 from dotenv import load_dotenv
 from graphdatascience import GraphDataScience
 from langchain.chains.llm import LLMChain
@@ -10,9 +11,8 @@ from langchain.chains.openai_functions import (
 )
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts.chat import ChatPromptTemplate
-from langchain.schema import AIMessage, HumanMessage, SystemMessage
-import streamlit as st
-import json
+from streamlit_agraph import Config, Edge, Node, agraph
+
 load_dotenv()
 
 llm = ChatOpenAI(temperature=0, model="gpt-4")
@@ -101,7 +101,7 @@ if st.button('Run'):
 
     nodes, edges = format_output(output)
 
-    config = Config(width=750,
+    config = Config(width=950,
                     height=950,
                     directed=True,
                     physics=True,
