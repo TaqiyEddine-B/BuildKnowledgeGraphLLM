@@ -1,15 +1,16 @@
-from langchain.chat_models import ChatOpenAI
-from langchain.prompts.chat import ChatPromptTemplate
-from langchain.chains.llm import LLMChain
-from langchain.schema import AIMessage, HumanMessage, SystemMessage
 import os
+
+from dotenv import load_dotenv
 from graphdatascience import GraphDataScience
+from langchain.chains.llm import LLMChain
 from langchain.chains.openai_functions import (
     create_openai_fn_chain,
     create_structured_output_chain,
 )
-from dotenv import load_dotenv
-
+from langchain.chat_models import ChatOpenAI
+from langchain.prompts.chat import ChatPromptTemplate
+from langchain.schema import AIMessage, HumanMessage, SystemMessage
+import streamlit as st
 load_dotenv()
 
 llm = ChatOpenAI(temperature=0, model="gpt-4")
@@ -25,9 +26,10 @@ prompt_template_entity = ChatPromptTemplate.from_messages([
                                                            ("human", "{user_input}"),])
 
 article_text='''
-"Albert Einstein was a theoretical physicist who was born on March 14, 1879, in Ulm, Germany. He is best known for his theory of relativity, including the famous equation E=mc². Einstein made groundbreaking contributions to the field of physics, and in 1921, he was awarded the Nobel Prize in Physics for his explanation of the photoelectric effect. He worked at various universities and institutions throughout his career, including the University of Zurich and the Institute for Advanced Study in Princeton, New Jersey. Einstein's work revolutionized our understanding of the universe and had a profound impact on the development of modern physics.
+Albert Einstein was a theoretical physicist who was born on March 14, 1879, in Ulm, Germany. He is best known for his theory of relativity, including the famous equation E=mc². Einstein made groundbreaking contributions to the field of physics, and in 1921, he was awarded the Nobel Prize in Physics for his explanation of the photoelectric effect. He worked at various universities and institutions throughout his career, including the University of Zurich and the Institute for Advanced Study in Princeton, New Jersey. Einstein's work revolutionized our understanding of the universe and had a profound impact on the development of modern physics.
 '''
 
+st.write(article_text)
 json_schema  = {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
@@ -63,9 +65,7 @@ json_schema  = {
 # llm_chain = LLMChain(llm=llm, prompt=prompt_template_entity, verbose=True)
 llm_chain= create_structured_output_chain(json_schema, llm, prompt_template_entity, verbose=True)
 
-output = llm_chain.run(user_input= article_text)
 
-
-print(output)
-print(type(output))
-print('hello')
+if st.button('Run'):
+  output = llm_chain.run(user_input= article_text)
+  st.write(output)
