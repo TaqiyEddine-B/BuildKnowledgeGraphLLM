@@ -4,3 +4,4 @@
 temp/*
 cypher
 output.json
+.env
