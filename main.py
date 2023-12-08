@@ -15,7 +15,9 @@ from streamlit_agraph import Config, Edge, Node, agraph
 
 load_dotenv()
 
-llm = ChatOpenAI(temperature=0, model="gpt-4")
+
+openai_key = st.sidebar.text_input('OpenAI Key', '')
+
 
 system_message_entity_prompt = """
 You are a data scientist working for a company that is building a knowledge graph of a set of input articles.
@@ -65,8 +67,7 @@ json_schema = {
 }
 
 # llm_chain = LLMChain(llm=llm, prompt=prompt_template_entity, verbose=True)
-llm_chain = create_structured_output_chain(
-    json_schema, llm, prompt_template_entity, verbose=True)
+
 
 
 def format_output(output):
@@ -86,10 +87,13 @@ def format_output(output):
 
 @st.cache_data
 def run(article_text):
+
     if os.path.exists('output.json'):
         with open('output.json', 'r') as f:
             output = json.load(f)
     else:
+        llm = ChatOpenAI(temperature=0, model="gpt-4")
+        llm_chain = create_structured_output_chain(json_schema, llm, prompt_template_entity, verbose=True)
         output = llm_chain.run(user_input=article_text)
         with open('output.json', 'w') as f:
             json.dump(output, f)
@@ -97,6 +101,17 @@ def run(article_text):
 
 
 if st.button('Run'):
+    if len(openai_key) > 0:
+        st.write('Setting OpenAI Key')
+        os.environ["OPENAI_API_KEY"] = openai_key
+    else:
+        st.write('Checking OpenAI Key from .env')
+        if 'OPENAI_API_KEY' not in os.environ:
+            st.write('No OpenAI Key')
+            st.stop()
+        else :
+            st.write('Using OpenAI Key from .env')
+
     output = run(article_text)
 
     nodes, edges = format_output(output)
