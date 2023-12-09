@@ -1,16 +1,8 @@
+""" Streamlit app for extracting relations from text using OpenAI's API """
 import json
 import os
 
 import streamlit as st
-from dotenv import load_dotenv
-from graphdatascience import GraphDataScience
-from langchain.chains.llm import LLMChain
-from langchain.chains.openai_functions import (
-    create_openai_fn_chain,
-    create_structured_output_chain,
-)
-from langchain.chat_models import ChatOpenAI
-from langchain.prompts.chat import ChatPromptTemplate
 from streamlit_agraph import Config, Edge, Node, agraph
 
 from src.extractor import extract
@@ -20,6 +12,7 @@ Albert Einstein was a theoretical physicist who was born on March 14, 1879, in U
 '''
 st.write(article_text)
 openai_key = st.sidebar.text_input('OpenAI Key', '')
+use_cache = st.sidebar.checkbox('Use Cache', value=False)
 
 def format_output(output):
     nodes = []
@@ -36,16 +29,15 @@ def format_output(output):
     return nodes, edges
 
 
-@st.cache_data
-def run(article_text:str):
 
-    if os.path.exists('output.json'):
+def run(article_text:str,use_cache:bool=False):
+    if use_cache and os.path.exists('output.json'):
         with open('output.json', 'r') as f:
             output = json.load(f)
-    else:
+    else :
         output = extract(article_text=article_text)
-        with open('output.json', 'w') as f:
-            json.dump(output, f)
+    with open('output.json', 'w') as f:
+        json.dump(output, f)
     return output
 
 
@@ -60,7 +52,7 @@ if st.button('Run'):
         else :
             st.toast('Using OpenAI Key from .env')
 
-    output = run(article_text=article_text)
+    output = run(article_text=article_text,use_cache=use_cache)
 
     nodes, edges = format_output(output)
 
