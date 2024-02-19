@@ -34,7 +34,7 @@ The application can be used to create a knowledge graph from a set of documents.
 
 # System overview
 The diagram below shows the system overview of the application.
-![System Overview](doc\overview.png)
+![System Overview](doc/overview.png)
 
 ## Steps
 The following steps represent the flow of the application:
