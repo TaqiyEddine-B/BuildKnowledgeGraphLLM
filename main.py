@@ -41,7 +41,7 @@ def run(article_text:str,use_cache:bool=False):
     return output
 
 
-if st.button('Run'):
+if st.button('Generate Knowledge Graph'):
 
     if len(openai_key) > 0:
         os.environ["OPENAI_API_KEY"] = openai_key
