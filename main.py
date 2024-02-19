@@ -7,12 +7,21 @@ from streamlit_agraph import Config, Edge, Node, agraph
 
 from src.extractor import extract
 
+st.set_page_config(
+    page_title="Knowledge Graph Generator using LLM",
+    page_icon="🧠",
+    layout="wide",
+)
+st.title('Knowledge Graph Generator using LLM')
+
 article_text = '''
 Albert Einstein was a theoretical physicist who was born on March 14, 1879, in Ulm, Germany. He is best known for his theory of relativity, including the famous equation E=mc². Einstein made groundbreaking contributions to the field of physics, and in 1921, he was awarded the Nobel Prize in Physics for his explanation of the photoelectric effect. He worked at various universities and institutions throughout his career, including the University of Zurich and the Institute for Advanced Study in Princeton, New Jersey. Einstein's work revolutionized our understanding of the universe and had a profound impact on the development of modern physics.
 '''
-st.write(article_text)
+
+
 openai_key = st.sidebar.text_input('OpenAI Key', '')
-use_cache = st.sidebar.checkbox('Use Cache', value=False)
+use_cache = st.sidebar.checkbox('Use Cache', value=True)
+
 
 def format_output(output):
     nodes = []
@@ -29,41 +38,54 @@ def format_output(output):
     return nodes, edges
 
 
-
-def run(article_text:str,use_cache:bool=False):
+def run(article_text: str, use_cache: bool = False):
     if use_cache and os.path.exists('output.json'):
         with open('output.json', 'r') as f:
             output = json.load(f)
-    else :
+    else:
         output = extract(article_text=article_text)
     with open('output.json', 'w') as f:
         json.dump(output, f)
     return output
 
 
-if st.button('Generate Knowledge Graph'):
+nodes, edges, config = None, None, None
 
-    if len(openai_key) > 0:
-        os.environ["OPENAI_API_KEY"] = openai_key
-    else:
-        if 'OPENAI_API_KEY' not in os.environ:
-            st.error('No OpenAI Key')
-            st.stop()
-        else :
-            st.toast('Using OpenAI Key from .env')
+col_input, col_result = st.columns([1, 1])
+with col_input:
+    st.title('Input')
+    st.subheader('Article Text', divider="blue")
+    article_text = st.text_area('Article Text', article_text, height=200)
 
-    output = run(article_text=article_text,use_cache=use_cache)
+    if st.button('Generate Knowledge Graph', type='primary'):
 
-    nodes, edges = format_output(output)
+        if len(openai_key) > 0:
+            os.environ["OPENAI_API_KEY"] = openai_key
+        else:
+            if 'OPENAI_API_KEY' not in os.environ:
+                st.error('No OpenAI Key')
+                st.stop()
+            else:
+                st.toast('Using OpenAI Key from .env')
 
-    config = Config(width=950,
-                    height=950,
-                    directed=True,
-                    physics=True,
-                    hierarchical=False,
-                    # **kwargs
-                    )
+        output = run(article_text=article_text, use_cache=use_cache)
 
-    return_value = agraph(nodes=nodes,
-                          edges=edges,
-                          config=config)
+        nodes, edges = format_output(output)
+
+        config = Config(width=950,
+                        height=950,
+                        directed=True,
+                        physics=True,
+                        hierarchical=False,
+                        # **kwargs
+                        )
+
+
+with col_result:
+    st.title('Result')
+    st.subheader('Knowledge Graph', divider="green")
+
+    if nodes is not None and edges is not None:
+        return_value = agraph(nodes=nodes,
+                              edges=edges,
+                              config=config)

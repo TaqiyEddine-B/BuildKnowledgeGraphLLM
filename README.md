@@ -44,3 +44,7 @@ The following steps represent the flow of the application:
 - The system sends the input to the LLM model.
 - The LLM model generates the knowledge graph.
 - The system displays the knowledge graph to the user.
+
+## UI
+The following screenshot shows the user interface of the application.
+![UI](doc/ui_v1.png)
