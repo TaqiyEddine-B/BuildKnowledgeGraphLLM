@@ -6,12 +6,16 @@ import streamlit as st
 from streamlit_agraph import Config, Edge, Node, agraph
 
 from src.extractor import extract
+from src.utils import load_openai_key
 
 st.set_page_config(
     page_title="Knowledge Graph Generator using LLM",
     page_icon="🧠",
     layout="wide",
 )
+
+openai_key = load_openai_key()
+
 st.title('Knowledge Graph Generator using LLM')
 
 article_text = '''
@@ -19,7 +23,6 @@ Albert Einstein was a theoretical physicist who was born on March 14, 1879, in U
 '''
 
 
-openai_key = st.sidebar.text_input('OpenAI Key', '')
 use_cache = st.sidebar.checkbox('Use Cache', value=True)
 
 
