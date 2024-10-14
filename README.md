@@ -25,7 +25,7 @@ The following steps represent the flow of the application:
 
 ## UI
 The following screenshot shows the user interface of the application.
-![UI](doc/ui_v1.png)
+![UI](doc/ui_v2.png)
 
 
 
