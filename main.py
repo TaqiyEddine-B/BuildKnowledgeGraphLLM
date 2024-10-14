@@ -36,7 +36,7 @@ st.sidebar.divider()
 
 st.sidebar.subheader('About')
 st.sidebar.link_button("GitHub Repository",
-                       "https://github.com/TaqiyEddine-B/ChatDocumentLLM")
+                       "https://github.com/TaqiyEddine-B/BuildKnowledgeGraphLLM")
 st.sidebar.link_button("My website", "https://taqiyeddine.com")
 
 
