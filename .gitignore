@@ -5,3 +5,7 @@ temp/*
 cypher
 output.json
 .env
+secrets.toml
+lib
+graph.html
+data

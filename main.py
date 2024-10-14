@@ -1,12 +1,9 @@
 """ Streamlit app for extracting relations from text using OpenAI's API """
 import json
 import os
-
 import streamlit as st
-from streamlit_agraph import Config, Edge, Node, agraph
-
 from src.extractor import extract
-from src.utils import load_openai_key
+from src.utils import load_openai_key,format_output_pyvis,display_pyvis
 
 st.set_page_config(
     page_title="Knowledge Graph Generator using LLM",
@@ -14,31 +11,33 @@ st.set_page_config(
     layout="wide",
 )
 
-openai_key = load_openai_key()
 
 st.title('Knowledge Graph Generator using LLM')
+st.write('This app generates a knowledge graph from the input text.')
 
 article_text = '''
 Albert Einstein was a theoretical physicist who was born on March 14, 1879, in Ulm, Germany. He is best known for his theory of relativity, including the famous equation E=mc². Einstein made groundbreaking contributions to the field of physics, and in 1921, he was awarded the Nobel Prize in Physics for his explanation of the photoelectric effect. He worked at various universities and institutions throughout his career, including the University of Zurich and the Institute for Advanced Study in Princeton, New Jersey. Einstein's work revolutionized our understanding of the universe and had a profound impact on the development of modern physics.
 '''
 
 
-use_cache = st.sidebar.checkbox('Use Cache', value=True)
+st.sidebar.subheader('Steps')
+st.sidebar.write("1. Add the OpenAI API key and press 'Enter'")
+st.sidebar.write("2. Enter the article text")
+st.sidebar.write("3. Click 'Generate Knowledge Graph'")
+
+st.sidebar.divider()
+openai_key, is_key_provided = load_openai_key()
+
+# use_cache = st.sidebar.checkbox('Use Cache', value=True)
+use_cache = False
 
 
-def format_output(output):
-    nodes = []
-    edges = []
-    # https://github.com/ChrisDelClea/streamlit-agraph/blob/master/streamlit_agraph/node.py
-    for node in output["nodes"]:
-        nodes.append(Node(id=node["id"], label=node["label"],
-                     size=25, shape="diamond"))
+st.sidebar.divider()
 
-    for edge in output["edges"]:
-        edges.append(
-            Edge(source=edge["source"], label=edge["relation"], target=edge["target"]))
-
-    return nodes, edges
+st.sidebar.subheader('About')
+st.sidebar.link_button("GitHub Repository",
+                       "https://github.com/TaqiyEddine-B/ChatDocumentLLM")
+st.sidebar.link_button("My website", "https://taqiyeddine.com")
 
 
 def run(article_text: str, use_cache: bool = False):
@@ -51,44 +50,15 @@ def run(article_text: str, use_cache: bool = False):
         json.dump(output, f)
     return output
 
-
-nodes, edges, config = None, None, None
-
 col_input, col_result = st.columns([1, 1])
 with col_input:
-    st.title('Input')
     st.subheader('Article Text', divider="blue")
-    article_text = st.text_area('Article Text', article_text, height=200)
-
-    if st.button('Generate Knowledge Graph', type='primary'):
-
-        if len(openai_key) > 0:
-            os.environ["OPENAI_API_KEY"] = openai_key
-        else:
-            if 'OPENAI_API_KEY' not in os.environ:
-                st.error('No OpenAI Key')
-                st.stop()
-            else:
-                st.toast('Using OpenAI Key from .env')
-
-        output = run(article_text=article_text, use_cache=use_cache)
-
-        nodes, edges = format_output(output)
-
-        config = Config(width=950,
-                        height=950,
-                        directed=True,
-                        physics=True,
-                        hierarchical=False,
-                        # **kwargs
-                        )
+    article_text = st.text_area('Article Text', article_text, height=400)
 
 
 with col_result:
-    st.title('Result')
     st.subheader('Knowledge Graph', divider="green")
-
-    if nodes is not None and edges is not None:
-        return_value = agraph(nodes=nodes,
-                              edges=edges,
-                              config=config)
+    if st.button('Generate Knowledge Graph', type='primary'):
+        output = run(article_text=article_text, use_cache=use_cache)
+        net = format_output_pyvis(output)
+        display_pyvis(net)
