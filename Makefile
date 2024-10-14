@@ -16,4 +16,4 @@ clean:
 	@echo "Virtual environment removed"
 
 run: 
-	streamlit run main.py --server.port 8080
+	streamlit run main.py --server.port 8002
