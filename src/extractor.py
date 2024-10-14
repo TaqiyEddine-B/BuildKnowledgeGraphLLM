@@ -1,5 +1,5 @@
 """ This module contains the extractor function that is used to extract information from a given article. """
-from dotenv import load_dotenv
+
 
 from langchain.chains.openai_functions import (
     create_structured_output_chain,
@@ -7,7 +7,6 @@ from langchain.chains.openai_functions import (
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts.chat import ChatPromptTemplate
 
-load_dotenv()
 
 system_message_entity_prompt = """
 You are a data scientist working for a company that is building a knowledge graph of a set of input articles.
@@ -53,8 +52,8 @@ json_schema = {
 }
 
 
-def extract(article_text):
-    llm = ChatOpenAI(temperature=0, model="gpt-4")
+def extract(article_text,openai_key):
+    llm = ChatOpenAI(temperature=0, model="gpt-4o",api_key=openai_key)
     llm_chain = create_structured_output_chain(json_schema, llm, prompt_template_entity, verbose=True)
     output = llm_chain.run(user_input=article_text)
     return output

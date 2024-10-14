@@ -45,7 +45,7 @@ def run(article_text: str, use_cache: bool = False):
         with open('output.json', 'r') as f:
             output = json.load(f)
     else:
-        output = extract(article_text=article_text)
+        output = extract(article_text=article_text,openai_key=openai_key)
     with open('output.json', 'w') as f:
         json.dump(output, f)
     return output
